@@ -1,21 +1,27 @@
 /*
-  voicekeys
+  Vocal Page Turner
 
   Use the Arduino Nano 33 BLE Sense to create a bluetooth HID that emits keystrokes based on voice commands using the built-in bluetooth and microphone.
 */
 
 #include <ArduinoBLE.h>
+#include "nano_33_board_utilities.h"
 
 BLEService genericService("1800"); // BLE Generic Access Profile Service
 BLEService hidService("1812"); // BLE HID Service
 BLEService battService("180F"); // BLE Battery Service
 BLEService mfrService("180A"); // BLE Manufacturer Service
 
+nano33BoardUtilities boardUtil;
+
 void setup() {
   Serial.begin(9600);
-  while (!Serial);
+  while (!Serial);  
 
-  constructHIDKeyboard();  
+  constructHIDKeyboard();
+    
+  boardUtil.controlRGBLED(1); // white LED
+  Serial.println("Ready");
 }
 
 void loop() {
@@ -28,9 +34,13 @@ void loop() {
     // print the central's MAC address:
     Serial.println(central.address());
 
+    boardUtil.controlRGBLED(3);
+
     // while the central is still connected to peripheral:
-    while (central.connected()) {
-        
+    int loopCount = 0;
+    while (central.connected() && loopCount < 100) {
+      loopCount++;
+      
       //if (keyboardCharacteristic.subscribed()) {
         Serial.println("Subscribed. Writing nonsense.");
         //keyboardCharacteristic.writeValue(0x04);
@@ -48,6 +58,8 @@ void loop() {
     // when the central disconnects, print it out:
     Serial.print(F("Disconnected from central: "));
     Serial.println(central.address());
+
+    boardUtil.controlRGBLED(1);
   }
 }
 
