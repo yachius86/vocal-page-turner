@@ -38,7 +38,7 @@ void loop() {
 
     // while the central is still connected to peripheral:
     int loopCount = 0;
-    while (central.connected() && loopCount < 100) {
+    while (central.connected()) {
       loopCount++;
       
       //if (keyboardCharacteristic.subscribed()) {
