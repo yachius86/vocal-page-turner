@@ -11,6 +11,7 @@ BLEService genericService("1800"); // BLE Generic Access Profile Service
 BLEService hidService("1812"); // BLE HID Service
 BLEService battService("180F"); // BLE Battery Service
 BLEService mfrService("180A"); // BLE Manufacturer Service
+BLEUnsignedCharCharacteristic inputCharacteristic("2a4d", BLERead | BLENotify);
 
 nano33BoardUtilities boardUtil;
 
@@ -37,22 +38,42 @@ void loop() {
     boardUtil.controlRGBLED(3);
 
     // while the central is still connected to peripheral:
-    int loopCount = 0;
-    while (central.connected()) {
-      loopCount++;
-      
-      //if (keyboardCharacteristic.subscribed()) {
+    while (central.connected()) {      
+      if (inputCharacteristic.subscribed()) {
         Serial.println("Subscribed. Writing nonsense.");
-        //keyboardCharacteristic.writeValue(0x04);
-        //keyboardCharacteristic.writeValue(0x05);
+//        unsigned char report[8] = { // keydown, capital A
+//          0x02, // modifier, Shift
+//          0x00, // reserved
+//          0x04, // key slot, A
+//          0x00, 0x00 ,0x00, 0x00, 0x00 //empty key slots
+//        };
+//        inputCharacteristic.writeValue((byte)0x02);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x04);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+        //inputCharacteristic.writeValue(report, 8); // send
         
-//        if (keyboardCharacteristic.value()) {   // any value other than 0
-//          Serial.println(F("LED on"));
-//        } else {                              // a 0 value
-//          Serial.println(F("LED off"));
-//          
-//        }
-      //}
+//        unsigned char report[8] = { // keyup
+//          0x00, // no modifiers
+//          0x00, // reserved
+//          0x00, 0x00, 0x00 ,0x00, 0x00, 0x00 // all empty key slots
+//        };
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+//        inputCharacteristic.writeValue((byte)0x00);
+        //inputCharacteristic.writeValue(report, 8); // send
+        
+        delay(1000);        
+      }
     }
 
     // when the central disconnects, print it out:
@@ -76,20 +97,20 @@ void constructHIDKeyboard() {
   BLE.setLocalName("Arduino Nano 33 BLE Sense");
 
   BLECharacteristic appearanceCharacteristic("2a00", BLERead, "Keyboard"); // string appearance
-  BLEUnsignedCharCharacteristic appearanceHexCharacteristic("2a01", BLERead); // hex appearance, value assigned separately
-  BLECharacteristic reportMapCharacteristic("2a4c", BLERead, "05010906A1010507850119E029E715002501750195088102950175088101950575010508850119012905910295017503910395067508150025650507190029658100C0");
+  BLECharCharacteristic appearanceHexCharacteristic("2a01", BLERead); // hex appearance, value assigned separately
+  BLECharacteristic reportMapCharacteristic("2a4b", BLERead, "05010906A101050719E029E71500250175019508810295017508810395057501050819012905910295017503910395067508150025650507190029658100C0");
   BLECharacteristic controlPointCharacteristic("2a4c", BLEWriteWithoutResponse, NULL, 1);
-  BLEUnsignedIntCharacteristic hidInfoCharacteristic("2a4a", BLERead);
-  BLECharacteristic inputCharacteristic("2a4d", BLENotify, NULL);
+  BLEUnsignedCharCharacteristic hidInfoCharacteristic("2a4a", BLERead);
+  
   BLEDescriptor inputDescriptor("2902", "0001");
   BLEUnsignedCharCharacteristic battCharacteristic("2A19", BLERead | BLENotify);
   BLECharacteristic mfrCharacteristic("2A29", BLERead, "ACohen");
-  BLEUnsignedShortCharacteristic pnpCharacteristic("2A50", BLERead);    
+  BLECharacteristic pnpCharacteristic("2A50", BLERead, "014700ffffffff");    
 
   appearanceHexCharacteristic.writeValue((byte)0x03C2); // present as a keyboard
   hidInfoCharacteristic.writeValue(00010002);
   battCharacteristic.writeValue((byte)0x64); // simulate 100% battery life
-  pnpCharacteristic.writeValue(004700);
+  //pnpCharacteristic.writeValue("014700ffffffff");
   inputCharacteristic.addDescriptor(inputDescriptor);
 
   // add the characteristics to the services
