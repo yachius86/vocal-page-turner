@@ -105,54 +105,29 @@ class bluetoothHIDKeyboard {
       Serial.println();
     };
 
-    /**************************************************************************/
-    /*!
-        @brief  Constantly poll for new command or response data
-    */
-    /**************************************************************************/
-    void poll_ble(void)
+    void send_keys(char keys)
     {
-      // Display prompt
-      Serial.print(F("keyboard > "));
-    
-      // Check for user input and echo it back if anything was found
-      char keys[BUFSIZE+1];
-      getUserInput(keys, BUFSIZE);
-    
       Serial.print("\nSending ");
       Serial.println(keys);
-    
+
       ble.print("AT+BleKeyboard=");
       ble.println(keys);
-    
-      if( ble.waitForOK() )
-      {
-        Serial.println( F("OK!") );
-      }else
-      {
-        Serial.println( F("FAILED!") );
-      }
+      
+      ble.waitForOK();
     };
 
-    /**************************************************************************/
-    /*!
-        @brief  Checks for user input (via the Serial Monitor)
-    */
-    /**************************************************************************/
-    void getUserInput(char buffer[], uint8_t maxSize)
+    void send_hid_report(String hidKey)
     {
-      memset(buffer, 0, maxSize);
-      while( Serial.available() == 0 ) {
-        delay(1);
-      }
-    
-      uint8_t count=0;
-    
-      do
-      {
-        count += Serial.readBytes(buffer+count, maxSize);
-        delay(2);
-      } while( (count < maxSize) && !(Serial.available() == 0) );
+      //key down
+      ble.print("AT+BLEKEYBOARDCODE=");
+      ble.print("00-00-");
+      ble.print(hidKey);
+      ble.println("-00-00-00-00");
+      
+      //key up      
+      ble.println("AT+BLEKEYBOARDCODE=00-00-00-00-00-00-00");
+      
+      ble.waitForOK();
     };
 };
 
