@@ -5,20 +5,20 @@
 */
 
 #include "Arduino.h"
-#include "bluetooth_hid_keyboard.h"
 #include "easyvr_3.h"
+#include "bluetooth_hid_keyboard.h"
+
 
 EasyVR3 vrUtil;
+bluetoothHIDKeyboard hidUtil;
 
 void setup()
 {
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
   Serial.println();
   Serial.println("Initializing VPT");
   vrUtil.init_vr();
+  hidUtil.init_hid();
   Serial.println("VPT Ready");
 }
 
