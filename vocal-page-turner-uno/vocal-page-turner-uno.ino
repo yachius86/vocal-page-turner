@@ -24,7 +24,9 @@ void setup()
   delay(150);
 
   // initialize voice recognition
-  vrUtil.init_vr();  
+  vrUtil.init_vr();
+
+  delay(150);
   
   Serial.println("VPT Ready");
 }

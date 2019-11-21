@@ -90,19 +90,13 @@ class bluetoothHIDKeyboard {
       if (! ble.reset() ) {
         error(F("Couldn't reset??"));
       }
+
+//      Serial.println(F("Disconnecting from any currently connected devices: "));
+//      ble.sendCommandCheckOK(F( "AT+GAPDISCONNECT"  ));
     
       Serial.println();
       Serial.println(F("Go to your phone's Bluetooth settings to pair your device"));
       Serial.println(F("then open an application that accepts keyboard input"));
-    
-      Serial.println();
-      Serial.println(F("Enter the character(s) to send:"));
-      Serial.println(F("- \\r for Enter"));
-      Serial.println(F("- \\n for newline"));
-      Serial.println(F("- \\t for tab"));
-      Serial.println(F("- \\b for backspace"));
-    
-      Serial.println();
     };
 
     void send_keys(char keys)
@@ -118,15 +112,15 @@ class bluetoothHIDKeyboard {
 
     void send_hid_report(String hidKey)
     {
-      //key down
-      ble.print("AT+BLEKEYBOARDCODE=");
-      ble.print("00-00-");
+      // key down
+      ble.print("AT+BLEKEYBOARDCODE=00-00-");
       ble.print(hidKey);
-      ble.println("-00-00-00-00");
+      ble.println("-00-00-00-00-00");
       
-      //key up      
-      ble.println("AT+BLEKEYBOARDCODE=00-00-00-00-00-00-00");
-      
+      // key up
+      ble.println("AT+BLEKEYBOARDCODE=00-00");
+
+      // block until there is a result
       ble.waitForOK();
     };
 };

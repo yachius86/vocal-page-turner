@@ -239,6 +239,11 @@ class EasyVR3 {
           }
         }
       }
+      
+      easyvr.stop();
+      easyvr.setMicDistance(1);
+      pcSerial.println(F("Set mic distance to 'headset'"));
+      
       group = 1;
       set = 0;
       mask |= 1; // force to use trigger (mixed SI/SD)
